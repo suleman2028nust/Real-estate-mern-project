@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ListingItem from '../components/ListingItem';
 
 export default function Search() {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [sidebardata, setSidebardata] = useState({
     searchTerm: '',
     type: 'all',
     parking: false,
     furnished: false,
     offer: false,
-    sort: 'created_at',
+    sort: 'createdAt',
     order: 'desc',
   });
 
@@ -43,24 +45,29 @@ export default function Search() {
         parking: parkingFromUrl === 'true' ? true : false,
         furnished: furnishedFromUrl === 'true' ? true : false,
         offer: offerFromUrl === 'true' ? true : false,
-        sort: sortFromUrl || 'created_at',
+        sort: sortFromUrl || 'createdAt',
         order: orderFromUrl || 'desc',
       });
     }
 
     const fetchListings = async () => {
-      setLoading(true);
-      setShowMore(false);
-      const searchQuery = urlParams.toString();
-      const res = await fetch(`/api/listing/get?${searchQuery}`);
-      const data = await res.json();
-      if (data.length > 8) {
-        setShowMore(true);
-      } else {
+      try {
+        setLoading(true);
         setShowMore(false);
+        const searchQuery = urlParams.toString();
+        const res = await fetch(`/api/listing/get?${searchQuery}`);
+        const data = await res.json();
+        if (data.length > 8) {
+          setShowMore(true);
+        } else {
+          setShowMore(false);
+        }
+        setListings(data);
+      } catch (error) {
+        console.error('Failed to fetch listings:', error);
+      } finally {
+        setLoading(false);
       }
-      setListings(data);
-      setLoading(false);
     };
 
     fetchListings();
@@ -92,10 +99,8 @@ export default function Search() {
     }
 
     if (e.target.id === 'sort_order') {
-      const sort = e.target.value.split('_')[0] || 'created_at';
-
+      const sort = e.target.value.split('_')[0] || 'createdAt';
       const order = e.target.value.split('_')[1] || 'desc';
-
       setSidebardata({ ...sidebardata, sort, order });
     }
   };
@@ -127,6 +132,7 @@ export default function Search() {
     }
     setListings([...listings, ...data]);
   };
+
   return (
     <div className='flex flex-col md:flex-row'>
       <div className='p-7  border-b-2 md:border-r-2 md:min-h-screen'>
@@ -214,12 +220,12 @@ export default function Search() {
             <label className='font-semibold'>Sort:</label>
             <select
               onChange={handleChange}
-              defaultValue={'created_at_desc'}
+              defaultValue={'createdAt_desc'}
               id='sort_order'
               className='border rounded-lg p-3'
             >
               <option value='regularPrice_desc'>Price high to low</option>
-              <option value='regularPrice_asc'>Price low to hight</option>
+              <option value='regularPrice_asc'>Price low to high</option>
               <option value='createdAt_desc'>Latest</option>
               <option value='createdAt_asc'>Oldest</option>
             </select>
