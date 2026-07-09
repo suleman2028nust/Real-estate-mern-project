@@ -11,6 +11,7 @@ import UpdateListing from './pages/UpdateListing';
 import Listing from './pages/Listing';
 import Search from './pages/Search';
 import Inbox from './pages/Inbox';
+import Favorites from './pages/Favorites';
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
             element={<UpdateListing />}
           />
           <Route path='/inbox' element={<Inbox />} />
+          <Route path='/favorites' element={<Favorites />} />
         </Route>
       </Routes>
     </BrowserRouter>

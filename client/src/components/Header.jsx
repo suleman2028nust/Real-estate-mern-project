@@ -1,4 +1,4 @@
-import { FaSearch, FaHome, FaInfoCircle, FaUser, FaPlus, FaInbox } from 'react-icons/fa';
+import { FaSearch, FaHome, FaInfoCircle, FaUser, FaPlus, FaInbox, FaHeart } from 'react-icons/fa';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
@@ -96,6 +96,13 @@ export default function Header() {
               >
                 <FaPlus className='text-xs' />
                 <span className='hidden sm:inline'>List Property</span>
+              </Link>
+              <Link
+                to='/favorites'
+                className='flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-red-500 transition-all relative'
+                title="Favorites"
+              >
+                <FaHeart />
               </Link>
               <Link
                 to='/inbox'

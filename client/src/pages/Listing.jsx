@@ -12,8 +12,11 @@ import {
   FaMapMarkerAlt,
   FaParking,
   FaShare,
+  FaHeart,
+  FaRegHeart,
 } from 'react-icons/fa';
 import ContactWidget from '../components/ContactWidget';
+import ReviewSection from '../components/ReviewSection';
 
 // https://sabe.io/blog/javascript-format-numbers-commas#:~:text=The%20best%20way%20to%20format,format%20the%20number%20with%20commas.
 
@@ -22,6 +25,7 @@ export default function Listing() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [favoriteId, setFavoriteId] = useState(null);
   const params = useParams();
   const { currentUser } = useSelector((state) => state.user);
 
@@ -46,6 +50,54 @@ export default function Listing() {
     };
     fetchListing();
   }, [params.listingId]);
+
+  useEffect(() => {
+    if (currentUser && listing) {
+      const fetchFavorites = async () => {
+        try {
+          const res = await fetch(`/api/favorite/user/${currentUser._id}`);
+          const data = await res.json();
+          if (data.success !== false) {
+            const fav = data.find(
+              (f) =>
+                f.listingRef?._id === listing._id ||
+                f.listingRef === listing._id
+            );
+            if (fav) setFavoriteId(fav._id);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      fetchFavorites();
+    }
+  }, [currentUser, listing]);
+
+  const toggleFavorite = async () => {
+    if (!currentUser) return;
+    try {
+      if (favoriteId) {
+        // remove
+        const res = await fetch(`/api/favorite/remove/${favoriteId}`, {
+          method: 'DELETE',
+        });
+        if (res.ok) setFavoriteId(null);
+      } else {
+        // add
+        const res = await fetch('/api/favorite/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ listingId: listing._id }),
+        });
+        const data = await res.json();
+        if (data.success !== false) {
+          setFavoriteId(data.favorite._id);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <main>
@@ -84,6 +136,21 @@ export default function Listing() {
             <p className='fixed top-[23%] right-[5%] z-10 rounded-md bg-slate-100 p-2'>
               Link copied!
             </p>
+          )}
+
+          {/* Favorite Button */}
+          {currentUser && currentUser._id !== listing.userRef && (
+            <div
+              onClick={toggleFavorite}
+              className='fixed top-[13%] right-[8%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer shadow-md hover:bg-slate-200 transition-colors'
+              title={favoriteId ? 'Remove from favorites' : 'Save to favorites'}
+            >
+              {favoriteId ? (
+                <FaHeart className='text-red-500 text-xl' />
+              ) : (
+                <FaRegHeart className='text-slate-500 text-xl' />
+              )}
+            </div>
           )}
           <div className='flex flex-col md:flex-row max-w-6xl mx-auto p-3 my-7 gap-8'>
             {/* Left Column: Listing Details */}
@@ -138,6 +205,9 @@ export default function Listing() {
                   {listing.furnished ? 'Furnished' : 'Unfurnished'}
                 </li>
               </ul>
+
+              {/* Reviews Section */}
+              <ReviewSection listingId={listing._id} />
             </div>
 
             {/* Right Column: Contact Widget */}

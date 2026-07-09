@@ -6,6 +6,8 @@ import userRouter from '../backend/routes/user.route.js';
 import authRouter from '../backend/routes/auth.route.js';
 import listingRouter from '../backend/routes/listing.route.js';
 import messageRouter from '../backend/routes/message.route.js';
+import favoriteRouter from '../backend/routes/favorite.route.js';
+import reviewRouter from '../backend/routes/review.route.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 
@@ -41,6 +43,8 @@ app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/listing', listingRouter);
 app.use('/api/message', messageRouter);
+app.use('/api/favorite', favoriteRouter);
+app.use('/api/review', reviewRouter);
 
 app.use(express.static(path.join(__dirname, '/client/dist')));
 
