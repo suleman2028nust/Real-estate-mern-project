@@ -5,11 +5,11 @@ import { useDispatch } from 'react-redux';
 import { signInSuccess } from '../redux/user/userSlice';
 import { useNavigate } from 'react-router-dom';
 
-export default function OAuth() {
+export default function OAuth(): JSX.Element {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleGoogleClick = async () => {
+  const handleGoogleClick = async (): Promise<void> => {
     try {
       const provider = new GoogleAuthProvider();
       const auth = getAuth(app);

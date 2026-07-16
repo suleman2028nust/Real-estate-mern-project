@@ -1,21 +1,27 @@
-import { useState } from 'react';
+import { useState, ChangeEvent, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice';
 import OAuth from '../components/OAuth';
 import { FaEnvelope, FaLock, FaHome } from 'react-icons/fa';
+import { RootState } from '../redux/store';
+
+interface SignInFormData {
+  email?: string;
+  password?: string;
+}
 
 export default function SignIn() {
-  const [formData, setFormData] = useState({});
-  const { loading, error } = useSelector((state) => state.user);
+  const [formData, setFormData] = useState<SignInFormData>({});
+  const { loading, error } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     try {
       dispatch(signInStart());
@@ -31,8 +37,8 @@ export default function SignIn() {
       }
       dispatch(signInSuccess(data));
       navigate('/');
-    } catch (error) {
-      dispatch(signInFailure(error.message));
+    } catch (err) {
+      dispatch(signInFailure((err as Error).message));
     }
   };
 
@@ -50,12 +56,13 @@ export default function SignIn() {
             perfect property across Pakistan.
           </p>
           <div className='flex gap-6 mt-4 text-center'>
-            {[['500+', 'Listings'], ['15+', 'Cities'], ['1200+', 'Clients']].map(([v, l]) => (
-              <div key={l}>
-                <p className='text-2xl font-bold'>{v}</p>
-                <p className='text-slate-400 text-sm'>{l}</p>
-              </div>
-            ))}
+            {(['500+', 'Listings'], ['15+', 'Cities'], ['1200+', 'Clients']) &&
+              ([['500+', 'Listings'], ['15+', 'Cities'], ['1200+', 'Clients']] as [string, string][]).map(([v, l]) => (
+                <div key={l}>
+                  <p className='text-2xl font-bold'>{v}</p>
+                  <p className='text-slate-400 text-sm'>{l}</p>
+                </div>
+              ))}
           </div>
         </div>
       </div>

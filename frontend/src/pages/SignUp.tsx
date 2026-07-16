@@ -1,19 +1,25 @@
-import { useState } from 'react';
+import { useState, ChangeEvent, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import OAuth from '../components/OAuth';
 import { FaEnvelope, FaLock, FaUser, FaHome } from 'react-icons/fa';
 
+interface SignUpFormData {
+  username?: string;
+  email?: string;
+  password?: string;
+}
+
 export default function SignUp() {
-  const [formData, setFormData] = useState({});
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<SignUpFormData>({});
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     try {
       setLoading(true);
@@ -31,11 +37,18 @@ export default function SignUp() {
       setLoading(false);
       setError(null);
       navigate('/sign-in');
-    } catch (error) {
+    } catch (err) {
       setLoading(false);
-      setError(error.message);
+      setError((err as Error).message);
     }
   };
+
+  const features: string[] = [
+    'Free to list your property',
+    'Verified property listings',
+    'Direct landlord contact',
+    'Nationwide coverage',
+  ];
 
   return (
     <div className='min-h-screen flex'>
@@ -134,9 +147,11 @@ export default function SignUp() {
             and connect with verified landlords across Pakistan.
           </p>
           <ul className='text-left text-slate-300 text-sm flex flex-col gap-3'>
-            {['Free to list your property', 'Verified property listings', 'Direct landlord contact', 'Nationwide coverage'].map((f) => (
+            {features.map((f) => (
               <li key={f} className='flex items-center gap-2'>
-                <span className='w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-400 text-xs'>✓</span>
+                <span className='w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-400 text-xs'>
+                  ✓
+                </span>
                 {f}
               </li>
             ))}
