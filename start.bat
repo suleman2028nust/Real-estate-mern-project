@@ -8,7 +8,7 @@ start "Backend (port 3000)" cmd /k "cd /d %~dp0 && npm run dev"
 
 timeout /t 2 /nobreak >nul
 
-start "Frontend (port 5173)" cmd /k "cd /d %~dp0client && npm run dev"
+start "Frontend (port 5173)" cmd /k "cd /d %~dp0frontend && npm run dev"
 
 echo Servers started!
 echo   Backend:  http://localhost:3000
