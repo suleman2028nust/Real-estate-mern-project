@@ -1,8 +1,13 @@
 import { Link } from 'react-router-dom';
 import { MdLocationOn, MdBed, MdBathtub } from 'react-icons/md';
 import { FaParking, FaCouch, FaTag } from 'react-icons/fa';
+import { Listing } from '../types';
 
-export default function ListingItem({ listing }) {
+interface ListingItemProps {
+  listing: Listing;
+}
+
+export default function ListingItem({ listing }: ListingItemProps): JSX.Element {
   return (
     <div className='bg-white shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden rounded-2xl w-full sm:w-[320px] group'>
       <Link to={`/listing/${listing._id}`}>

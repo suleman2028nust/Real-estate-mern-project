@@ -1,10 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { Listing, Landlord } from '../types';
 
-export default function Contact({ listing }) {
-  const [landlord, setLandlord] = useState(null);
-  const [message, setMessage] = useState('');
-  const onChange = (e) => {
+interface ContactProps {
+  listing: Listing;
+}
+
+export default function Contact({ listing }: ContactProps): JSX.Element {
+  const [landlord, setLandlord] = useState<Landlord | null>(null);
+  const [message, setMessage] = useState<string>('');
+  
+  const onChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
     setMessage(e.target.value);
   };
 

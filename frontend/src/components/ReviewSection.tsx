@@ -1,15 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { useSelector } from 'react-redux';
 import { FaStar } from 'react-icons/fa';
+import { Review } from '../types';
+import { RootState } from '../redux/store';
 
-export default function ReviewSection({ listingId }) {
-  const { currentUser } = useSelector((state) => state.user);
-  const [reviews, setReviews] = useState([]);
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [hasReviewed, setHasReviewed] = useState(false);
+interface ReviewSectionProps {
+  listingId: string;
+}
+
+export default function ReviewSection({ listingId }: ReviewSectionProps): JSX.Element {
+  const { currentUser } = useSelector((state: RootState) => state.user);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [rating, setRating] = useState<number>(5);
+  const [comment, setComment] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hasReviewed, setHasReviewed] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -32,7 +38,7 @@ export default function ReviewSection({ listingId }) {
     fetchReviews();
   }, [listingId, currentUser]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (!currentUser) {
       setError('You must be logged in to leave a review.');

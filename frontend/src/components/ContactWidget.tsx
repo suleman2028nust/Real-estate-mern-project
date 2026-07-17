@@ -1,16 +1,23 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { FaEnvelope, FaCalendarAlt, FaMoneyBillWave } from 'react-icons/fa';
+import { Listing } from '../types';
+import { User } from '../redux/user/userSlice';
 
-export default function ContactWidget({ listing, currentUser }) {
-  const [activeTab, setActiveTab] = useState('INQUIRY'); // INQUIRY, TOUR_REQUEST, OFFER
-  const [message, setMessage] = useState('');
-  const [amount, setAmount] = useState('');
-  const [date, setDate] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(null);
+interface ContactWidgetProps {
+  listing: Listing;
+  currentUser: User | null;
+}
 
-  const handleSubmit = async (e) => {
+export default function ContactWidget({ listing, currentUser }: ContactWidgetProps): JSX.Element {
+  const [activeTab, setActiveTab] = useState<'INQUIRY' | 'TOUR_REQUEST' | 'OFFER'>('INQUIRY');
+  const [message, setMessage] = useState<string>('');
+  const [amount, setAmount] = useState<string>('');
+  const [date, setDate] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [success, setSuccess] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (!currentUser) {
       setError('You must be logged in to contact the landlord.');
@@ -22,7 +29,7 @@ export default function ContactWidget({ listing, currentUser }) {
       setError(null);
       setSuccess(false);
 
-      const payload = {
+      const payload: Record<string, any> = {
         listingRef: listing._id,
         receiverRef: listing.userRef,
         type: activeTab,

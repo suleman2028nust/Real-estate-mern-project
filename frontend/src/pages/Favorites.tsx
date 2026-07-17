@@ -2,12 +2,19 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { FaHeart, FaTrash } from 'react-icons/fa';
+import { Listing } from '../types';
+import { RootState } from '../redux/store';
 
-export default function Favorites() {
-  const { currentUser } = useSelector((state) => state.user);
-  const [favorites, setFavorites] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+interface FavoriteItem {
+  _id: string;
+  listingRef: Listing;
+}
+
+export default function Favorites(): JSX.Element {
+  const { currentUser } = useSelector((state: RootState) => state.user);
+  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -34,7 +41,7 @@ export default function Favorites() {
     }
   }, [currentUser]);
 
-  const handleRemoveFavorite = async (favoriteId) => {
+  const handleRemoveFavorite = async (favoriteId: string): Promise<void> => {
     try {
       const res = await fetch(`/api/favorite/remove/${favoriteId}`, {
         method: 'DELETE',
@@ -44,7 +51,7 @@ export default function Favorites() {
         return;
       }
       setFavorites((prev) => prev.filter((fav) => fav._id !== favoriteId));
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.message);
     }
   };

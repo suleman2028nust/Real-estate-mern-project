@@ -1,16 +1,17 @@
 import { FaSearch, FaHome, FaInfoCircle, FaUser, FaPlus, FaInbox, FaHeart } from 'react-icons/fa';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, FormEvent } from 'react';
+import { RootState } from '../redux/store';
 
-export default function Header() {
-  const { currentUser } = useSelector((state) => state.user);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [scrolled, setScrolled] = useState(false);
+export default function Header(): JSX.Element {
+  const { currentUser } = useSelector((state: RootState) => state.user);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [scrolled, setScrolled] = useState<boolean>(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     const urlParams = new URLSearchParams(window.location.search);
     urlParams.set('searchTerm', searchTerm);

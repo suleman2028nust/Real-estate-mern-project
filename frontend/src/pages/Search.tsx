@@ -1,12 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ListingItem from '../components/ListingItem';
+import { Listing } from '../types';
 
-export default function Search() {
+interface SidebarData {
+  searchTerm: string;
+  type: string;
+  parking: boolean;
+  furnished: boolean;
+  offer: boolean;
+  sort: string;
+  order: string;
+}
+
+export default function Search(): JSX.Element {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [sidebardata, setSidebardata] = useState({
+  const [sidebardata, setSidebardata] = useState<SidebarData>({
     searchTerm: '',
     type: 'all',
     parking: false,
@@ -16,9 +27,9 @@ export default function Search() {
     order: 'desc',
   });
 
-  const [loading, setLoading] = useState(false);
-  const [listings, setListings] = useState([]);
-  const [showMore, setShowMore] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [showMore, setShowMore] = useState<boolean>(false);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -73,7 +84,7 @@ export default function Search() {
     fetchListings();
   }, [location.search]);
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
     if (
       e.target.id === 'all' ||
       e.target.id === 'rent' ||
@@ -94,7 +105,7 @@ export default function Search() {
       setSidebardata({
         ...sidebardata,
         [e.target.id]:
-          e.target.checked || e.target.checked === 'true' ? true : false,
+          (e.target as HTMLInputElement).checked || e.target.value === 'true' ? true : false,
       });
     }
 
@@ -105,7 +116,7 @@ export default function Search() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     const urlParams = new URLSearchParams();
     urlParams.set('searchTerm', sidebardata.searchTerm);
@@ -119,7 +130,7 @@ export default function Search() {
     navigate(`/search?${searchQuery}`);
   };
 
-  const onShowMoreClick = async () => {
+  const onShowMoreClick = async (): Promise<void> => {
     const numberOfListings = listings.length;
     const startIndex = numberOfListings;
     const urlParams = new URLSearchParams(location.search);

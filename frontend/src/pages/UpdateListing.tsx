@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import {
   getDownloadURL,
   getStorage,
@@ -8,14 +8,15 @@ import {
 import { app } from '../firebase';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
+import { RootState } from '../redux/store';
 
-export default function CreateListing() {
-  const { currentUser } = useSelector((state) => state.user);
+export default function UpdateListing(): JSX.Element {
+  const { currentUser } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
   const params = useParams();
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState<FileList | null>(null);
   const [formData, setFormData] = useState({
-    imageUrls: [],
+    imageUrls: [] as string[],
     name: '',
     description: '',
     address: '',
@@ -28,10 +29,10 @@ export default function CreateListing() {
     parking: false,
     furnished: false,
   });
-  const [imageUploadError, setImageUploadError] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState<string | false>(false);
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [error, setError] = useState<string | false>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -48,11 +49,11 @@ export default function CreateListing() {
     fetchListing();
   }, []);
 
-  const handleImageSubmit = (e) => {
-    if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
+  const handleImageSubmit = (): void => {
+    if (files && files.length > 0 && files.length + formData.imageUrls.length < 7) {
       setUploading(true);
       setImageUploadError(false);
-      const promises = [];
+      const promises: Promise<string>[] = [];
 
       for (let i = 0; i < files.length; i++) {
         promises.push(storeImage(files[i]));
@@ -76,7 +77,7 @@ export default function CreateListing() {
     }
   };
 
-  const storeImage = async (file) => {
+  const storeImage = async (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const storage = getStorage(app);
       const fileName = new Date().getTime() + file.name;
@@ -101,14 +102,14 @@ export default function CreateListing() {
     });
   };
 
-  const handleRemoveImage = (index) => {
+  const handleRemoveImage = (index: number): void => {
     setFormData({
       ...formData,
       imageUrls: formData.imageUrls.filter((_, i) => i !== index),
     });
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     if (e.target.id === 'sale' || e.target.id === 'rent') {
       setFormData({
         ...formData,
@@ -123,7 +124,7 @@ export default function CreateListing() {
     ) {
       setFormData({
         ...formData,
-        [e.target.id]: e.target.checked,
+        [e.target.id]: (e.target as HTMLInputElement).checked,
       });
     }
 
@@ -139,7 +140,7 @@ export default function CreateListing() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     try {
       if (formData.imageUrls.length < 1)
@@ -155,7 +156,7 @@ export default function CreateListing() {
         },
         body: JSON.stringify({
           ...formData,
-          userRef: currentUser._id,
+          userRef: currentUser?._id,
         }),
       });
       const data = await res.json();
@@ -164,7 +165,7 @@ export default function CreateListing() {
         setError(data.message);
       }
       navigate(`/listing/${data._id}`);
-    } catch (error) {
+    } catch (error: any) {
       setError(error.message);
       setLoading(false);
     }

@@ -2,12 +2,27 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { FaEnvelope, FaCalendarAlt, FaMoneyBillWave, FaCheck, FaTimes } from 'react-icons/fa';
+import { Listing, Landlord } from '../types';
+import { RootState } from '../redux/store';
 
-export default function Inbox() {
-  const { currentUser } = useSelector((state) => state.user);
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+interface Message {
+  _id: string;
+  type: 'INQUIRY' | 'TOUR_REQUEST' | 'OFFER';
+  status: 'PENDING' | 'READ' | 'ACCEPTED' | 'REJECTED';
+  createdAt: string;
+  senderRef: Landlord;
+  receiverRef: Landlord;
+  listingRef: Listing;
+  amount?: number;
+  date?: string;
+  content: string;
+}
+
+export default function Inbox(): JSX.Element {
+  const { currentUser } = useSelector((state: RootState) => state.user);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -29,7 +44,7 @@ export default function Inbox() {
     if (currentUser) fetchMessages();
   }, [currentUser]);
 
-  const handleUpdateStatus = async (id, newStatus) => {
+  const handleUpdateStatus = async (id: string, newStatus: string): Promise<void> => {
     try {
       const res = await fetch(`/api/message/update/${id}`, {
         method: 'POST',
@@ -45,7 +60,7 @@ export default function Inbox() {
     }
   };
 
-  const getIcon = (type) => {
+  const getIcon = (type: string): JSX.Element => {
     switch (type) {
       case 'INQUIRY': return <FaEnvelope className="text-slate-500" />;
       case 'TOUR_REQUEST': return <FaCalendarAlt className="text-blue-500" />;
@@ -54,7 +69,7 @@ export default function Inbox() {
     }
   };
 
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (status: string): JSX.Element | null => {
     switch (status) {
       case 'PENDING': return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>;
       case 'READ': return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Read</span>;

@@ -6,11 +6,12 @@ import 'swiper/css/bundle';
 import ListingItem from '../components/ListingItem';
 import { FaArrowRight, FaSearch, FaHome, FaKey } from 'react-icons/fa';
 import { MdApartment } from 'react-icons/md';
+import { Listing } from '../types';
 
-export default function Home() {
-  const [offerListings, setOfferListings] = useState([]);
-  const [saleListings, setSaleListings] = useState([]);
-  const [rentListings, setRentListings] = useState([]);
+export default function Home(): JSX.Element {
+  const [offerListings, setOfferListings] = useState<Listing[]>([]);
+  const [saleListings, setSaleListings] = useState<Listing[]>([]);
+  const [rentListings, setRentListings] = useState<Listing[]>([]);
 
   useEffect(() => {
     const fetchOfferListings = async () => {

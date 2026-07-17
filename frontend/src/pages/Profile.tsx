@@ -1,5 +1,5 @@
-import { useSelector } from 'react-redux';
-import { useRef, useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useRef, useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import {
   getDownloadURL,
   getStorage,
@@ -16,19 +16,22 @@ import {
   deleteUserSuccess,
   signOutUserStart,
   signOutUserSuccess,
+  User
 } from '../redux/user/userSlice';
-import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-export default function Profile() {
-  const fileRef = useRef(null);
-  const { currentUser, loading, error } = useSelector((state) => state.user);
-  const [file, setFile] = useState(undefined);
-  const [filePerc, setFilePerc] = useState(0);
-  const [fileUploadError, setFileUploadError] = useState(false);
-  const [formData, setFormData] = useState({});
-  const [updateSuccess, setUpdateSuccess] = useState(false);
-  const [showListingsError, setShowListingsError] = useState(false);
-  const [userListings, setUserListings] = useState([]);
+import { RootState } from '../redux/store';
+import { Listing } from '../types';
+
+export default function Profile(): JSX.Element {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const { currentUser, loading, error } = useSelector((state: RootState) => state.user);
+  const [file, setFile] = useState<File | undefined>(undefined);
+  const [filePerc, setFilePerc] = useState<number>(0);
+  const [fileUploadError, setFileUploadError] = useState<boolean>(false);
+  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [updateSuccess, setUpdateSuccess] = useState<boolean>(false);
+  const [showListingsError, setShowListingsError] = useState<boolean>(false);
+  const [userListings, setUserListings] = useState<Listing[]>([]);
   const dispatch = useDispatch();
 
   // firebase storage
@@ -43,7 +46,7 @@ export default function Profile() {
     }
   }, [file]);
 
-  const handleFileUpload = (file) => {
+  const handleFileUpload = (file: File): void => {
     const storage = getStorage(app);
     const fileName = new Date().getTime() + file.name;
     const storageRef = ref(storage, fileName);
@@ -67,11 +70,11 @@ export default function Profile() {
     );
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     try {
       dispatch(updateUserStart());
@@ -90,12 +93,12 @@ export default function Profile() {
 
       dispatch(updateUserSuccess(data));
       setUpdateSuccess(true);
-    } catch (error) {
+    } catch (error: any) {
       dispatch(updateUserFailure(error.message));
     }
   };
 
-  const handleDeleteUser = async () => {
+  const handleDeleteUser = async (): Promise<void> => {
     try {
       dispatch(deleteUserStart());
       const res = await fetch(`/api/user/delete/${currentUser._id}`, {
@@ -107,12 +110,12 @@ export default function Profile() {
         return;
       }
       dispatch(deleteUserSuccess(data));
-    } catch (error) {
+    } catch (error: any) {
       dispatch(deleteUserFailure(error.message));
     }
   };
 
-  const handleSignOut = async () => {
+  const handleSignOut = async (): Promise<void> => {
     try {
       dispatch(signOutUserStart());
       const res = await fetch('/api/auth/signout');
@@ -122,12 +125,12 @@ export default function Profile() {
         return;
       }
       dispatch(signOutUserSuccess());
-    } catch (error) {
+    } catch (error: any) {
       dispatch(deleteUserFailure(error.message));
     }
   };
 
-  const handleShowListings = async () => {
+  const handleShowListings = async (): Promise<void> => {
     try {
       setShowListingsError(false);
       const res = await fetch(`/api/user/listings/${currentUser._id}`);
@@ -143,7 +146,7 @@ export default function Profile() {
     }
   };
 
-  const handleListingDelete = async (listingId) => {
+  const handleListingDelete = async (listingId: string): Promise<void> => {
     try {
       const res = await fetch(`/api/listing/delete/${listingId}`, {
         method: 'DELETE',
@@ -166,15 +169,15 @@ export default function Profile() {
       <h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
       <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
         <input
-          onChange={(e) => setFile(e.target.files[0])}
+          onChange={(e) => setFile(e.target.files?.[0])}
           type='file'
           ref={fileRef}
           hidden
           accept='image/*'
         />
         <img
-          onClick={() => fileRef.current.click()}
-          src={formData.avatar || currentUser.avatar}
+          onClick={() => fileRef.current?.click()}
+          src={formData.avatar || currentUser?.avatar}
           alt='profile'
           className='rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2'
         />
@@ -194,7 +197,7 @@ export default function Profile() {
         <input
           type='text'
           placeholder='username'
-          defaultValue={currentUser.username}
+          defaultValue={currentUser?.username}
           id='username'
           className='border p-3 rounded-lg'
           onChange={handleChange}
@@ -203,7 +206,7 @@ export default function Profile() {
           type='email'
           placeholder='email'
           id='email'
-          defaultValue={currentUser.email}
+          defaultValue={currentUser?.email}
           className='border p-3 rounded-lg'
           onChange={handleChange}
         />

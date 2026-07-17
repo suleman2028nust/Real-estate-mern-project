@@ -17,17 +17,19 @@ import {
 } from 'react-icons/fa';
 import ContactWidget from '../components/ContactWidget';
 import ReviewSection from '../components/ReviewSection';
+import { Listing as ListingType } from '../types';
+import { RootState } from '../redux/store';
 
 // https://sabe.io/blog/javascript-format-numbers-commas#:~:text=The%20best%20way%20to%20format,format%20the%20number%20with%20commas.
 
-export default function Listing() {
-  const [listing, setListing] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [favoriteId, setFavoriteId] = useState(null);
-  const params = useParams();
-  const { currentUser } = useSelector((state) => state.user);
+export default function Listing(): JSX.Element {
+  const [listing, setListing] = useState<ListingType | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
+  const [favoriteId, setFavoriteId] = useState<string | null>(null);
+  const params = useParams<{ listingId: string }>();
+  const { currentUser } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -59,7 +61,7 @@ export default function Listing() {
           const data = await res.json();
           if (data.success !== false) {
             const fav = data.find(
-              (f) =>
+              (f: any) =>
                 f.listingRef?._id === listing._id ||
                 f.listingRef === listing._id
             );
@@ -73,7 +75,7 @@ export default function Listing() {
     }
   }, [currentUser, listing]);
 
-  const toggleFavorite = async () => {
+  const toggleFavorite = async (): Promise<void> => {
     if (!currentUser) return;
     try {
       if (favoriteId) {
