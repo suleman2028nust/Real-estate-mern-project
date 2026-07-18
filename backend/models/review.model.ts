@@ -1,14 +1,23 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
-const reviewSchema = new mongoose.Schema(
+export interface IReview extends Document {
+  userRef: mongoose.Types.ObjectId;
+  listingRef: mongoose.Types.ObjectId;
+  rating: number;
+  comment: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const reviewSchema = new Schema<IReview>(
   {
     userRef: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
     listingRef: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'Listing',
       required: true,
     },
@@ -30,6 +39,6 @@ const reviewSchema = new mongoose.Schema(
 // Ensure a user can only leave one review per listing
 reviewSchema.index({ userRef: 1, listingRef: 1 }, { unique: true });
 
-const Review = mongoose.model('Review', reviewSchema);
+const Review = mongoose.model<IReview>('Review', reviewSchema);
 
 export default Review;

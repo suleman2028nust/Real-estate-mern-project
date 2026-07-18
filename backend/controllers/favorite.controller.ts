@@ -1,11 +1,11 @@
+import { Request, Response, NextFunction } from 'express';
 import Favorite from '../models/favorite.model.js';
 import { errorHandler } from '../utils/error.js';
 
-export const addFavorite = async (req, res, next) => {
+export const addFavorite = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { listingId } = req.body;
-    
-    // Check if already favorited
+
     const existing = await Favorite.findOne({ userRef: req.user.id, listingRef: listingId });
     if (existing) {
       return next(errorHandler(400, 'Listing is already in your favorites!'));
@@ -23,11 +23,11 @@ export const addFavorite = async (req, res, next) => {
   }
 };
 
-export const removeFavorite = async (req, res, next) => {
+export const removeFavorite = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const favorite = await Favorite.findById(req.params.id);
     if (!favorite) return next(errorHandler(404, 'Favorite not found!'));
-    
+
     if (req.user.id !== favorite.userRef.toString()) {
       return next(errorHandler(401, 'You can only remove your own favorites!'));
     }
@@ -39,7 +39,7 @@ export const removeFavorite = async (req, res, next) => {
   }
 };
 
-export const getUserFavorites = async (req, res, next) => {
+export const getUserFavorites = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   if (req.user.id !== req.params.userId) {
     return next(errorHandler(401, 'You can only view your own favorites!'));
   }

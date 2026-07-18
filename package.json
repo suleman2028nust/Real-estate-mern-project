@@ -2,11 +2,11 @@
   "name": "mern-estate",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "backend/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "nodemon backend/index.js",
-    "start": "node backend/index.js",
+    "dev": "nodemon --exec \"node --loader ts-node/esm\" backend/index.ts",
+    "start": "node --loader ts-node/esm backend/index.ts",
     "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
   },
   "keywords": [],
@@ -20,5 +20,15 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.5.0",
     "nodemon": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/mongoose": "^5.11.96",
+    "@types/node": "^26.1.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^7.0.2"
   }
 }

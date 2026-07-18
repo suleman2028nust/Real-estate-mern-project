@@ -1,11 +1,11 @@
+import { Request, Response, NextFunction } from 'express';
 import Review from '../models/review.model.js';
 import { errorHandler } from '../utils/error.js';
 
-export const createReview = async (req, res, next) => {
+export const createReview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { listingId, rating, comment } = req.body;
-    
-    // Check if user already reviewed
+
     const existing = await Review.findOne({ userRef: req.user.id, listingRef: listingId });
     if (existing) {
       return next(errorHandler(400, 'You have already reviewed this property!'));
@@ -19,17 +19,14 @@ export const createReview = async (req, res, next) => {
     });
 
     await newReview.save();
-    
-    // Populate user details before returning
     const populatedReview = await newReview.populate('userRef', 'username avatar');
-    
     res.status(201).json(populatedReview);
   } catch (error) {
     next(error);
   }
 };
 
-export const getListingReviews = async (req, res, next) => {
+export const getListingReviews = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const reviews = await Review.find({ listingRef: req.params.listingId })
       .populate('userRef', 'username avatar')
@@ -40,11 +37,11 @@ export const getListingReviews = async (req, res, next) => {
   }
 };
 
-export const updateReview = async (req, res, next) => {
+export const updateReview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const review = await Review.findById(req.params.id);
     if (!review) return next(errorHandler(404, 'Review not found!'));
-    
+
     if (req.user.id !== review.userRef.toString()) {
       return next(errorHandler(401, 'You can only update your own reviews!'));
     }
@@ -66,11 +63,11 @@ export const updateReview = async (req, res, next) => {
   }
 };
 
-export const deleteReview = async (req, res, next) => {
+export const deleteReview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const review = await Review.findById(req.params.id);
     if (!review) return next(errorHandler(404, 'Review not found!'));
-    
+
     if (req.user.id !== review.userRef.toString()) {
       return next(errorHandler(401, 'You can only delete your own reviews!'));
     }

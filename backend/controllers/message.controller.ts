@@ -1,11 +1,10 @@
+import { Request, Response, NextFunction } from 'express';
 import Message from '../models/message.model.js';
-import Listing from '../models/listing.model.js';
 import { errorHandler } from '../utils/error.js';
 
-export const createMessage = async (req, res, next) => {
+export const createMessage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { listingRef, receiverRef, type, content, amount, date } = req.body;
-    
     const message = await Message.create({
       listingRef,
       senderRef: req.user.id,
@@ -15,15 +14,14 @@ export const createMessage = async (req, res, next) => {
       amount,
       date,
     });
-    return res.status(201).json(message);
+    res.status(201).json(message);
   } catch (error) {
     next(error);
   }
 };
 
-export const getUserMessages = async (req, res, next) => {
+export const getUserMessages = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    // Get messages where the user is either the sender or receiver
     const messages = await Message.find({
       $or: [{ senderRef: req.user.id }, { receiverRef: req.user.id }],
     })
@@ -38,14 +36,13 @@ export const getUserMessages = async (req, res, next) => {
   }
 };
 
-export const updateMessageStatus = async (req, res, next) => {
+export const updateMessageStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const message = await Message.findById(req.params.id);
     if (!message) {
       return next(errorHandler(404, 'Message not found!'));
     }
 
-    // Only the receiver can update status (e.g., mark READ, ACCEPT offer)
     if (req.user.id !== message.receiverRef.toString()) {
       return next(errorHandler(401, 'You can only update your own received messages!'));
     }
